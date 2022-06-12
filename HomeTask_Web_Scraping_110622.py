@@ -27,18 +27,25 @@ def get_articles():
     soup, url, site_link = get_html_page()
     count_articles = 0
     articles = soup.find_all(class_='tm-articles-list__item')
+    articles_list = []
+    print('*' * 150, 'Данные по статьям: ')
     for article in articles:
         count_articles += 1
         date_publ = article.find(class_="tm-article-snippet__datetime-published").find('time').attrs['title']
         title = article.find(class_="tm-article-snippet__title tm-article-snippet__title_h2").text
         article_link = article.find(class_="tm-article-snippet__title-link").attrs['href']
-        try:
-            article_text = article.find(class_="article-formatted-body "
-            "article-formatted-body article-formatted-body_version-2").text
-        except AttributeError:
-            continue
         hub = article.find(class_="tm-article-snippet__hubs").text
-        print(f'Статья №{count_articles}: Дата/время: {date_publ} -- Заголовок: {title} -- Ссылка: {site_link}{article_link} -- Текст: {article_text} -- Хабы: {hub}')
+        try:
+            article_text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-2").text
+        except AttributeError:
+            article_text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-1").text
+        clean_article_text = article_text.replace('\n\n', '').replace('\r\n', ''). replace('\n', '').replace('\xa0', '')
+        print(f'Статья №{count_articles}: Дата/время: {date_publ} -- Заголовок: {title} -- Ссылка: {site_link}'
+                  f'{article_link} -- Текст статьи: {clean_article_text} -- Хабы: {hub}')
+        articles_list.append([count_articles, date_publ, title, site_link + article_link, clean_article_text, hub])
+    print('*' * 150, 'Список статей: ')
+    pprint(articles_list)
+    return articles_list
 
 
 if __name__ == '__main__':
