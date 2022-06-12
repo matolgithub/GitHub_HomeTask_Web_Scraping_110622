@@ -2,8 +2,6 @@ import requests as re
 from bs4 import BeautifulSoup as bs
 from pprint import pprint
 
-KEYWORDS = ['дизайн', 'фото', 'web', 'python']
-
 def get_html_page():
     site_link = 'https://habr.com'
     add_link = '/ru/all/'
@@ -43,10 +41,23 @@ def get_articles():
         print(f'Статья №{count_articles}: Дата/время: {date_publ} -- Заголовок: {title} -- Ссылка: {site_link}'
                   f'{article_link} -- Текст статьи: {clean_article_text} -- Хабы: {hub}')
         articles_list.append([count_articles, date_publ, title, site_link + article_link, clean_article_text, hub])
-    print('*' * 150, 'Список статей: ')
-    pprint(articles_list)
+
     return articles_list
 
+def select_articles():
+    KEYWORDS = ['дизайн', 'фото', 'web', 'python']
+    articles_list = get_articles()
+    result_list = []
+    for word in KEYWORDS:
+        for item_article in articles_list:
+            if word in item_article[2] or word in item_article[4] or word in item_article[5]:
+                result_list.append(item_article)
+    print('*' * 150, 'Выборка статей: ')
+    pprint(result_list)
+    print('*' * 70, 'РЕЗУЛЬТИРУЮЩАЯ ВЫБОРКА: ', '*' * 70)
+    for item_list in result_list:
+        print(f'{item_list[1]} - {item_list[2]} - {item_list[3]}.')
+    return result_list
 
 if __name__ == '__main__':
-    get_articles()
+    select_articles()
