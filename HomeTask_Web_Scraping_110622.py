@@ -2,12 +2,12 @@ import requests as re
 from bs4 import BeautifulSoup as bs
 from pprint import pprint
 
-# определяем список ключевых слов
 KEYWORDS = ['дизайн', 'фото', 'web', 'python']
 
-# Ваш код
 def get_html_page():
-    url = 'https://habr.com/ru/all/'
+    site_link = 'https://habr.com'
+    add_link = '/ru/all/'
+    url = site_link + add_link
     HEADERS = {
         'accept-language': 'ru-RU,ru;q=0.9',
         'cookie': 'yandexuid=7517158921651275583; i=BfXMTmCzHSgXtAltGVouXdmLDy62Y88MRkbxDsxkvQcwZY2ZxGj3YY/QmyMKfqCv6VnD5UtWB+PFH36oUnMsrd7yVQk=; yuidss=7517158921651275583; ymex=1970333463.yrts.1654973463',
@@ -21,27 +21,25 @@ def get_html_page():
     }
     res_get = re.get(url, headers=HEADERS)
     soup = bs(res_get.text, 'html.parser')
-    # pprint(soup)
-    return soup
+    return soup, url, site_link
 
 def get_articles():
-    soup = get_html_page()
-    articles = soup.find(class_='tm-articles-list').find_all(class_='tm-articles-list__item')
-    # pprint(articles)
-    dates_publ = soup.find_all(class_="tm-article-snippet__datetime-published")
-    # pprint(dates_publ)
-    titles = soup.find_all(class_="tm-article-snippet__title tm-article-snippet__title_h2")
-    pprint(titles)
-    # for post in posts:
-    #     post_id = post.parent.attrs.get('id')
-    #     # если идентификатор не найден, это что-то странное, пропускаем
-    #     if not post_id:
-    #         continue
-    #     post_id = int(post_id.split('_')[-1])
-    #     print('post', post_id)
-
+    soup, url, site_link = get_html_page()
+    count_articles = 0
+    articles = soup.find_all(class_='tm-articles-list__item')
+    for article in articles:
+        count_articles += 1
+        date_publ = article.find(class_="tm-article-snippet__datetime-published").find('time').attrs['title']
+        title = article.find(class_="tm-article-snippet__title tm-article-snippet__title_h2").text
+        article_link = article.find(class_="tm-article-snippet__title-link").attrs['href']
+        try:
+            article_text = article.find(class_="article-formatted-body "
+            "article-formatted-body article-formatted-body_version-2").text
+        except AttributeError:
+            continue
+        hub = article.find(class_="tm-article-snippet__hubs").text
+        print(f'Статья №{count_articles}: Дата/время: {date_publ} -- Заголовок: {title} -- Ссылка: {site_link}{article_link} -- Текст: {article_text} -- Хабы: {hub}')
 
 
 if __name__ == '__main__':
-    # get_html_page()
     get_articles()
