@@ -2,6 +2,20 @@ import requests as re
 from bs4 import BeautifulSoup as bs
 from pprint import pprint
 
+
+def input_menu():
+    while True:
+        input_item = input("Приветствуем! Введите (1 - поиск по preview, 2 - поиск по всей статье): ")
+        if input_item == "1":
+            select_articles()
+            break
+        elif input_item == "2":
+            selfrom_allarticle()
+            break
+        else:
+            print("Ваш ввод не понятен! Попробуйте снова!")
+
+
 def get_html_page():
     site_link = 'https://habr.com'
     add_link = '/ru/all/'
@@ -59,5 +73,8 @@ def select_articles():
         print(f'{item_list[1]} - {item_list[2]} - {item_list[3]}.')
     return result_list
 
+def selfrom_allarticle():
+    pass
+
 if __name__ == '__main__':
-    select_articles()
+    input_menu()
